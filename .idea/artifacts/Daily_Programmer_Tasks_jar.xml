@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="Daily Programmer Tasks:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/Daily_Programmer_Tasks_jar</output-path>
+    <root id="archive" name="Daily Programmer Tasks.jar">
+      <element id="module-output" name="Daily Programmer Tasks" />
+    </root>
+  </artifact>
+</component>

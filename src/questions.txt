@@ -1,0 +1,4 @@
+
+Is your animal a mammal?
+Is your animal a swimmer?
+Is your animal grey?
