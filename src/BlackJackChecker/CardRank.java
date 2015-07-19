@@ -19,10 +19,13 @@ public enum CardRank {
     private final int value;
 
     CardRank(int value) {
+
         this.value = value;
     }
 
-    private int value() { return value; }
+    private int value() {
+        return value;
+    }
 
 
 }
