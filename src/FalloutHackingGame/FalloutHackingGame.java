@@ -4,190 +4,95 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
 
 public class FalloutHackingGame {
 
-    int guessesLeft = 4;
-    int difficulty = 0;
-    String rightWord = "";
-    int wordLength = 0;
-    boolean gameWon = false;
+    private static List<String> wordList;
+    private static List<String> gameWordList;
+    private static String winningWord;
+    private static int guessesLeft = 4;
+    private static int correctChars;
+    private static Random rng;
+    private static boolean gameEnd;
 
-    public static void main (String[] args) {
-        FalloutHackingGame game = new FalloutHackingGame();
-        game.startGame();
+    public static void main(String[] args) {
+        wordList = new ArrayList<>();
+        gameWordList = new ArrayList<>();
+        rng = new Random();
+        populateList(wordList);
 
+        System.out.println("Difficulty (1-5) ? ");
+        int userDifficulty = new Scanner(System.in).nextInt();
+
+        for(int i = 0; i<(userDifficulty*3);) {
+            int randomNumber = rng.nextInt(wordList.size());
+            if(wordList.get(randomNumber).length() == userDifficulty*3) {
+                gameWordList.add(wordList.get(randomNumber).toUpperCase());
+                i++;
+            }
+        }
+
+        // Randomíze a word out of the given gamewordList
+        winningWord = gameWordList.get(rng.nextInt(gameWordList.size()));
+
+        // Print out the gameList of words
+        for(String word : gameWordList) {
+            System.out.println(word);
+        }
+
+        // For dev purposes
+        System.out.println(winningWord);
+
+        // Get the userInput as long as the game is not won and he has enough guesses
+        while(!gameEnd && guessesLeft != 0) {
+            gameLoop();
+        }
     }
 
-    public void startGame() {
-        Scanner input = new Scanner(System.in);
-        System.out.println("Difficulty (1-5) ? ");
-        Random rng = new Random();
-        ArrayList<String> wordList = new ArrayList<>();
-        int diffLevel = input.nextInt();
-        int amountWords = diffLevel*4;
+    public static void populateList(List<String> wordList) {
 
-        try {
-            wordList = createWordList();
-
-
+        try(BufferedReader in = new BufferedReader(new FileReader("enable1.txt"))) {
+            String line;
+            while(in.readLine() != null) {
+                line = in.readLine();
+                wordList.add(line.toUpperCase());
+            }
         } catch(IOException e) {
             e.printStackTrace();
-
         }
-        int i = 0;
-        switch(diffLevel) {
-            case 1:
-                Random rngNumber1 = new Random();
-                int randomRightNumber1 = rngNumber1.nextInt(4);
-                wordLength = 4;
-                while(i<amountWords) {
-                    int number = rng.nextInt(wordList.size());
-                    String word = wordList.get(number);
-                    if(i == randomRightNumber1) {
-                        rightWord = word;
-                    }
-                    wordList.remove(number);
-                    if(word.length() == wordLength) {
-                        i++;
-                        System.out.println(word.toUpperCase());
-                    }
-
-                }
-                break;
-
-            case 2:
-                Random rngNumber2 = new Random();
-                int randomRightNumber2 = rngNumber2.nextInt(8);
-                wordLength = 6;
-                while(i<amountWords) {
-                    int number = rng.nextInt(wordList.size());
-                    String word = wordList.get(number);
-                    if(i == randomRightNumber2) {
-                        rightWord = word;
-                    }
-                    wordList.remove(number);
-                    if(word.length() == wordLength) {
-                        System.out.println(word.toUpperCase());
-                        i++;
-                    }
-
-                }
-                break;
-
-            case 3:
-                Random rngNumber3 = new Random();
-                int randomRightNumber3 = rngNumber3.nextInt(12);
-                wordLength = 9;
-                while(i<amountWords) {
-                    int number = rng.nextInt(wordList.size());
-                    String word = wordList.get(number);
-                    if(i == randomRightNumber3) {
-                        rightWord = word;
-                    }
-                    wordList.remove(number);
-                    if(word.length() == wordLength) {
-                        i++;
-                        System.out.println(word.toUpperCase());
-                    }
-
-                }
-                break;
-
-            case 4:
-                Random rngNumber4 = new Random();
-                int randomRightNumber4 = rngNumber4.nextInt(16);
-                wordLength = 11;
-                while(i<amountWords) {
-                    int number = rng.nextInt(wordList.size());
-                    String word = wordList.get(number);
-                    if(i == randomRightNumber4) {
-                        rightWord = word;
-                    }
-                    wordList.remove(number);
-                    if(word.length() == wordLength) {
-                        i++;
-                        System.out.println(word.toUpperCase());
-                    }
-
-                }
-                break;
-
-            case 5:
-                Random rngNumber5 = new Random();
-                int randomRightNumber5 = rngNumber5.nextInt(20);
-                wordLength = 13;
-                while(i<amountWords) {
-                    int number = rng.nextInt(wordList.size());
-                    String word = wordList.get(number);
-                    if(i == randomRightNumber5) {
-                        rightWord = word;
-                    }
-                    wordList.remove(number);
-                    if(word.length() == wordLength) {
-                        i++;
-                        System.out.println(word.toUpperCase());
-                    }
-
-                }
-                break;
-
-        }
-        while(!gameWon) {
-            System.out.println("Guess (" + guessesLeft + " left) ?");
-            Scanner newInput = new Scanner(System.in);
-            System.out.println("Right word: " + rightWord);
-            String guessWord = newInput.nextLine();
-
-            guessesLeft--;
-            if(guessesLeft == 0) { System.out.println("Sry Bud, Shutting down your access. You have lost!"); break; }
-
-            System.out.println(checkWord(guessWord.toUpperCase(), rightWord.toUpperCase()) + "/" + wordLength + " correct");
-
-            if (checkWord(guessWord.toUpperCase(), rightWord.toUpperCase()) == wordLength) {
-                System.out.println("You have won! You needed: " + (4 - guessesLeft) + " tries.");
-                gameWon = true;
-            }
-        }
-
-
     }
 
-    public ArrayList<String> createWordList() throws IOException {
-        ArrayList<String> strings = new ArrayList<String>();
-
-        try (BufferedReader br = new BufferedReader(new FileReader("C:/Users/Paul/IdeaProjects/Daily Programmer Tasks/src/enable1.txt"))) {
-
-            String line = br.readLine();
-
-            while (line != null) {
-                line = br.readLine();
-                strings.add(line);
-
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return strings;
-
-    }
-
-    public int checkWord(String input, String word) {
-        int correctCharacters = 0;
-        char[] guessCharArray = input.toCharArray();
-        char[] rightCharArray = word.toCharArray();
-
-
-        for (int i = 0; i < guessCharArray.length; i++) {
-            if (guessCharArray[i] == rightCharArray[i]) {
-                correctCharacters++;
+    public static boolean checkUserInput(String userInput, String winningWord) {
+        correctChars = 0;
+        char[] userInputChars = userInput.toCharArray();
+        char[] winningWordChars = winningWord.toCharArray();
+        boolean gameWon = false;
+        for(int i  = 0; i<winningWord.length(); i++) {
+            if(userInputChars[i] == winningWordChars[i]) {
+                correctChars++;
+                if(correctChars == winningWordChars.length) { gameWon = true; }
             }
         }
-
-        return correctCharacters;
+        return gameWon;
     }
 
+    public static void gameLoop() {
+        System.out.println("Guess (" + guessesLeft + " left) ? ");
+        String userInput = new Scanner(System.in).nextLine().toUpperCase();
+
+        guessesLeft--;
+        if(checkUserInput(userInput, winningWord)) {
+            gameEnd = true;
+            System.out.println(correctChars + "/" + winningWord.length() + " correct");
+            System.out.println("YOU WIN!");
+        } else if(guessesLeft == 0) {
+            System.out.println("You have lost!");
+        } else {
+            System.out.println(correctChars + "/" + winningWord.length() + " correct");
+        }
+    }
 
 }
